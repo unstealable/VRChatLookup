@@ -7,6 +7,7 @@ import { ProfileCard } from "@/components/ProfileCard";
 import { WorldCard } from "@/components/WorldCard";
 import { GroupCard } from "@/components/GroupCard";
 import { ResultSelector } from "@/components/ResultSelector";
+import { Navigation } from "@/components/Navigation";
 import { VRChatUser, VRChatWorld, VRChatGroup, SearchResponse, SearchType, SearchMethod } from "@/types/vrchat";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -176,7 +177,8 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-background/50">
+    <div className="min-h-screen bg-gradient-to-br from-background to-background/50 relative">
+      <Navigation />
       <div className="container mx-auto px-4 py-8 lg:py-16">
         <div className="space-y-12">
           <SearchForm onSearch={handleSearch} loading={loading} />

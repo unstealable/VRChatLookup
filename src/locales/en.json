@@ -1,5 +1,6 @@
 {
-  "title": "VRCLookup - VRChat Search Engine",
+  "title": "VRCLookup",
+  "subtitle": "Discover and explore the VRChat universe - Search users, worlds, and groups effortlessly",
   "searchPlaceholder": "Search for users, worlds or groups...",
   "searchButton": "Search",
   "loading": "Searching...",
@@ -52,5 +53,9 @@
   "selectResult": "Select a result",
   "multipleResults": "Multiple results found",
   "noResultsFound": "No results found",
-  "searchResults": "Search results"
+  "searchResults": "Search results",
+  "searchType": "Search type",
+  "searchMethod": "Search method",
+  "newSearch": "New search",
+  "switchToEnglish": "English"
 }

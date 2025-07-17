@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Base URL pour l'API VRChat Bridge
-    const baseUrl = "https://vrchat-bridge.unstealable.cloud";
+    const baseUrl = process.env.VRCHAT_BRIDGE_API_URL || "https://vrchat-bridge.unstealable.cloud";
     let endpoint = "";
 
     // Construire l'endpoint selon le type de recherche

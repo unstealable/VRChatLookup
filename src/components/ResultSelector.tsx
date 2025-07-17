@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { ArrowLeft, User, Globe, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,6 +10,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import {
   VRChatUser,
   VRChatWorld,
@@ -40,26 +43,26 @@ export const ResultSelector: React.FC<ResultSelectorProps> = ({
       return (
         <Card
           key={user.id}
-          className="hover:shadow-md transition-shadow cursor-pointer"
+          className="hover:shadow-lg transition-all duration-300 cursor-pointer hover:scale-[1.02] border-2 hover:border-primary/20"
           onClick={() => onSelect(user)}
         >
-          <CardHeader className="pb-2">
-            <div className="flex items-center space-x-3">
-              {userIcon && (
-                <img
-                  draggable={false}
-                  src={userIcon}
-                  alt={`${user.displayName}'s avatar`}
-                  className="w-12 h-12 rounded-full object-cover"
-                  onError={(e) => {
-                    e.currentTarget.style.display = "none";
-                  }}
-                />
-              )}
-              <div>
-                <CardTitle className="text-lg">{user.displayName}</CardTitle>
+          <CardHeader className="pb-3">
+            <div className="flex items-center space-x-4">
+              <Avatar className="w-16 h-16">
+                <AvatarImage src={userIcon} alt={`${user.displayName}'s avatar`} />
+                <AvatarFallback className="bg-primary/10">
+                  <User className="w-8 h-8 text-primary" />
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <CardTitle className="text-lg truncate">{user.displayName}</CardTitle>
                 {user.username && (
-                  <CardDescription>@{user.username}</CardDescription>
+                  <CardDescription className="text-sm truncate">@{user.username}</CardDescription>
+                )}
+                {user.status && (
+                  <Badge variant="secondary" className="mt-1 text-xs">
+                    {t(user.status)}
+                  </Badge>
                 )}
               </div>
             </div>
@@ -80,29 +83,36 @@ export const ResultSelector: React.FC<ResultSelectorProps> = ({
       return (
         <Card
           key={world.id}
-          className="hover:shadow-md transition-shadow cursor-pointer"
+          className="hover:shadow-lg transition-all duration-300 cursor-pointer hover:scale-[1.02] border-2 hover:border-primary/20"
           onClick={() => onSelect(world)}
         >
-          <CardHeader className="pb-2">
-            <div className="flex items-center space-x-3">
-              {world.thumbnailImageUrl && (
-                <img
-                  draggable={false}
-                  src={world.thumbnailImageUrl}
-                  alt={world.name}
-                  className="w-12 h-12 rounded object-cover"
-                  onError={(e) => {
-                    e.currentTarget.style.display = "none";
-                  }}
-                />
-              )}
-              <div>
-                <CardTitle className="text-lg">{world.name}</CardTitle>
+          <CardHeader className="pb-3">
+            <div className="flex items-center space-x-4">
+              <Avatar className="w-16 h-16 rounded-lg">
+                <AvatarImage src={world.thumbnailImageUrl} alt={world.name} className="object-cover" />
+                <AvatarFallback className="bg-primary/10 rounded-lg">
+                  <Globe className="w-8 h-8 text-primary" />
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <CardTitle className="text-lg truncate">{world.name}</CardTitle>
                 {world.authorName && (
-                  <CardDescription>
+                  <CardDescription className="text-sm truncate">
                     {t("author")}: {world.authorName}
                   </CardDescription>
                 )}
+                <div className="flex gap-2 mt-1">
+                  {world.capacity && (
+                    <Badge variant="outline" className="text-xs">
+                      {world.capacity} {t("capacity")}
+                    </Badge>
+                  )}
+                  {world.visitCount && (
+                    <Badge variant="outline" className="text-xs">
+                      {world.visitCount} {t("visits")}
+                    </Badge>
+                  )}
+                </div>
               </div>
             </div>
           </CardHeader>
@@ -122,28 +132,28 @@ export const ResultSelector: React.FC<ResultSelectorProps> = ({
       return (
         <Card
           key={group.id}
-          className="hover:shadow-md transition-shadow cursor-pointer"
+          className="hover:shadow-lg transition-all duration-300 cursor-pointer hover:scale-[1.02] border-2 hover:border-primary/20"
           onClick={() => onSelect(group)}
         >
-          <CardHeader className="pb-2">
-            <div className="flex items-center space-x-3">
-              {group.iconUrl && (
-                <img
-                  draggable={false}
-                  src={group.iconUrl}
-                  alt={group.name}
-                  className="w-12 h-12 rounded object-cover"
-                  onError={(e) => {
-                    e.currentTarget.style.display = "none";
-                  }}
-                />
-              )}
-              <div>
-                <CardTitle className="text-lg">{group.name}</CardTitle>
+          <CardHeader className="pb-3">
+            <div className="flex items-center space-x-4">
+              <Avatar className="w-16 h-16 rounded-lg">
+                <AvatarImage src={group.iconUrl} alt={group.name} className="object-cover" />
+                <AvatarFallback className="bg-primary/10 rounded-lg">
+                  <Users className="w-8 h-8 text-primary" />
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <CardTitle className="text-lg truncate">{group.name}</CardTitle>
                 {group.shortCode && (
-                  <CardDescription className="font-mono">
+                  <CardDescription className="font-mono text-sm truncate">
                     {group.shortCode}
                   </CardDescription>
+                )}
+                {group.memberCount && (
+                  <Badge variant="secondary" className="mt-1 text-xs">
+                    {group.memberCount} {t("memberCount")}
+                  </Badge>
                 )}
               </div>
             </div>
@@ -163,13 +173,16 @@ export const ResultSelector: React.FC<ResultSelectorProps> = ({
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto animate-fadeIn">
+    <div className="w-full max-w-6xl mx-auto animate-fadeIn">
       <div className="text-center space-y-4 mb-8">
-        <h2 className="text-2xl font-bold">{t("multipleResults")}</h2>
-        <p className="text-muted-foreground">{t("selectResult")}</p>
+        <h2 className="text-3xl font-bold">{t("multipleResults")}</h2>
+        <p className="text-muted-foreground text-lg">{t("selectResult")}</p>
+        <Badge variant="outline" className="text-sm">
+          {results.length} {t("searchResults")}
+        </Badge>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-8">
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3 mb-8">
         {results.map((result) => renderResultItem(result))}
       </div>
 
@@ -177,9 +190,10 @@ export const ResultSelector: React.FC<ResultSelectorProps> = ({
         <Button
           variant="outline"
           onClick={onCancel}
-          className="hover:scale-105 transition-transform duration-200"
+          className="hover:scale-105 transition-all duration-200 px-6 py-3 text-base"
         >
-          {t("searchButton")} {/* Réutiliser pour "Nouvelle recherche" */}
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          {t("newSearch")}
         </Button>
       </div>
     </div>

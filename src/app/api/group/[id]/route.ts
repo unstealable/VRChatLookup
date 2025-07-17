@@ -5,7 +5,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const baseUrl = 'https://vrchat-bridge.unstealable.cloud'
+    const baseUrl = process.env.VRCHAT_BRIDGE_API_URL || 'https://vrchat-bridge.unstealable.cloud'
     const { id: groupId } = await params
 
     // Récupérer le groupe par ID

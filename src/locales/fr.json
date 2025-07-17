@@ -1,5 +1,6 @@
 {
-  "title": "VRCLookup - Moteur de recherche VRChat",
+  "title": "VRCLookup",
+  "subtitle": "Découvrez et explorez l'univers VRChat - Recherchez utilisateurs, mondes et groupes facilement",
   "searchPlaceholder": "Rechercher un utilisateur, monde ou groupe...",
   "searchButton": "Rechercher",
   "loading": "Recherche en cours...",
@@ -52,5 +53,9 @@
   "selectResult": "Sélectionnez un résultat",
   "multipleResults": "Plusieurs résultats trouvés",
   "noResultsFound": "Aucun résultat trouvé",
-  "searchResults": "Résultats de recherche"
+  "searchResults": "Résultats de recherche",
+  "searchType": "Type de recherche",
+  "searchMethod": "Méthode de recherche",
+  "newSearch": "Nouvelle recherche",
+  "switchToFrench": "Français"
 }

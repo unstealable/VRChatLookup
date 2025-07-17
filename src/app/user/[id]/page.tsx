@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { VRChatUser } from '@/types/vrchat'
 import { ProfileCard } from '@/components/ProfileCard'
+import { Navigation } from '@/components/Navigation'
 import { useLanguage } from '@/contexts/LanguageContext'
 
 export default function UserPage() {
@@ -83,8 +84,9 @@ export default function UserPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-background to-background/50 relative">
+      <Navigation />
+      <div className="container mx-auto px-4 py-8 lg:py-16">
         <ProfileCard user={user} />
       </div>
     </div>
