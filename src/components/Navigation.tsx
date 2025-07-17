@@ -1,10 +1,11 @@
 'use client'
 
-import { Languages } from 'lucide-react'
+import { Languages, FileText } from 'lucide-react'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { ThemeToggle } from './ThemeToggle'
 import { HomeButton } from './HomeButton'
 import { Button } from '@/components/ui/button'
+import Link from 'next/link'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,11 +14,18 @@ import {
 } from '@/components/ui/dropdown-menu'
 
 export function Navigation() {
-  const { language, setLanguage } = useLanguage()
+  const { language, setLanguage, t } = useLanguage()
 
   return (
     <nav className="fixed top-4 right-4 z-50 flex items-center gap-2">
       <HomeButton />
+      
+      <Link href="/changelogs">
+        <Button variant="outline" size="icon" className="h-9 w-9">
+          <FileText className="h-4 w-4" />
+          <span className="sr-only">{t('viewChangelog')}</span>
+        </Button>
+      </Link>
       
       <DropdownMenu>
         <DropdownMenuTrigger asChild>

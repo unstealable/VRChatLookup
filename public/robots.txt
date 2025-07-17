@@ -1,6 +1,17 @@
 User-agent: *
 Allow: /
 Disallow: /api/
+Disallow: /_next/
+Disallow: /admin/
+Disallow: /private/
+
+# Crawl-delay for better performance
+Crawl-delay: 1
 
 # Sitemap
-Sitemap: https://vrclookup.vercel.app/sitemap.xml
+Sitemap: https://vrclookup.unstealable.cloud/sitemap.xml
+
+# Rich snippets and structured data
+Allow: /user/
+Allow: /world/
+Allow: /group/

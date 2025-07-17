@@ -8,8 +8,10 @@ import { WorldCard } from "@/components/WorldCard";
 import { GroupCard } from "@/components/GroupCard";
 import { ResultSelector } from "@/components/ResultSelector";
 import { Navigation } from "@/components/Navigation";
+import { StructuredData } from "@/components/StructuredData";
 import { VRChatUser, VRChatWorld, VRChatGroup, SearchResponse, SearchType, SearchMethod } from "@/types/vrchat";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { generateWebsiteStructuredData } from "@/lib/structured-data";
 
 export default function Home() {
   const [users, setUsers] = useState<VRChatUser[]>([]);
@@ -176,8 +178,11 @@ export default function Home() {
     return null;
   };
 
+  const websiteStructuredData = generateWebsiteStructuredData()
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-background/50 relative">
+      <StructuredData data={websiteStructuredData} />
       <Navigation />
       <div className="container mx-auto px-4 py-8 lg:py-16">
         <div className="space-y-12">
