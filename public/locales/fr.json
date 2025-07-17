@@ -52,5 +52,7 @@
   "multipleResults": "Plusieurs résultats trouvés",
   "noResultsFound": "Aucun résultat trouvé",
   "searchResults": "Résultats de recherche",
-  "pronouns": "Pronoms"
+  "pronouns": "Pronoms",
+  "searchType": "Type de recherche",
+  "searchMethod": "Méthode de recherche"
 }

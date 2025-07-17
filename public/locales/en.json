@@ -52,5 +52,7 @@
   "multipleResults": "Multiple results found",
   "noResultsFound": "No results found",
   "searchResults": "Search results",
-  "pronouns": "Pronouns"
+  "pronouns": "Pronouns",
+  "searchType": "Search type",
+  "searchMethod": "Search method"
 }
