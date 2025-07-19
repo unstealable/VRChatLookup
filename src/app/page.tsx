@@ -208,8 +208,7 @@ export default function Home() {
         <ValidationResult
           type={validationResult.type}
           value={validationResult.value}
-          exists={validationResult.exists}
-          available={validationResult.available}
+          userExists={validationResult.exists}
           message={validationResult.message}
           error={validationResult.error}
           isLoading={validationResult.isLoading}
