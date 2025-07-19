@@ -7,8 +7,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 interface ValidationResultProps {
   type: "username" | "email";
   value: string;
-  exists: boolean | null;
-  available: boolean | null;
+  userExists: boolean | null;
   message: string;
   error?: string | null;
   isLoading?: boolean;
@@ -17,8 +16,7 @@ interface ValidationResultProps {
 export const ValidationResult: React.FC<ValidationResultProps> = ({
   type,
   value,
-  exists,
-  available,
+  userExists,
   message,
   error,
   isLoading = false,
@@ -33,13 +31,13 @@ export const ValidationResult: React.FC<ValidationResultProps> = ({
     if (error) return error;
     if (isLoading) return t("checkingAvailability");
 
-    // Translate the API response message
+    // Use userExists to determine availability (false = available, true = taken)
     if (type === "username") {
-      if (available === true) return t("usernameAvailable");
-      if (available === false) return t("usernameUnavailable");
+      if (userExists === false) return t("usernameAvailable");
+      if (userExists === true) return t("usernameUnavailable");
     } else if (type === "email") {
-      if (available === true) return t("emailAvailable");
-      if (available === false) return t("emailUnavailable");
+      if (userExists === false) return t("emailAvailable");
+      if (userExists === true) return t("emailUnavailable");
     }
 
     return message;
@@ -66,9 +64,9 @@ export const ValidationResult: React.FC<ValidationResultProps> = ({
               className={`text-lg ${
                 error
                   ? "text-red-600"
-                  : available === true
+                  : userExists === false
                   ? "text-green-600"
-                  : available === false
+                  : userExists === true
                   ? "text-red-600"
                   : "text-muted-foreground"
               }`}
@@ -84,9 +82,9 @@ export const ValidationResult: React.FC<ValidationResultProps> = ({
             <p className="font-semibold">
               {isLoading
                 ? t("checking")
-                : exists === true
+                : userExists === true
                 ? t("exists")
-                : exists === false
+                : userExists === false
                 ? t("notFound")
                 : t("unknown")}
             </p>
@@ -99,9 +97,9 @@ export const ValidationResult: React.FC<ValidationResultProps> = ({
             <p className="font-semibold">
               {isLoading
                 ? t("checking")
-                : available === true
+                : userExists === false
                 ? t("available")
-                : available === false
+                : userExists === true
                 ? t("taken")
                 : t("unknown")}
             </p>
