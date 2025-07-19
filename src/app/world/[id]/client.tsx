@@ -8,6 +8,7 @@ import { Navigation } from '@/components/Navigation'
 import { StructuredData } from '@/components/StructuredData'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { generateWorldStructuredData, generateBreadcrumbStructuredData } from '@/lib/structured-data'
+import { logger } from '@/lib/logger'
 
 export default function WorldClient() {
   const params = useParams()
@@ -20,11 +21,14 @@ export default function WorldClient() {
   useEffect(() => {
     if (!id) return
 
+    logger.info(`WorldClient: Starting fetch for world ID: ${id}`);
+
     const fetchWorld = async () => {
       try {
         setLoading(true)
         setError(null)
 
+        logger.apiRequest('GET', `/api/world/${id}`, { source: 'WorldClient' });
         const response = await fetch(`/api/world/${id}`)
 
         if (!response.ok) {
@@ -32,19 +36,49 @@ export default function WorldClient() {
         }
 
         const data = await response.json()
+        logger.apiResponse('GET', `/api/world/${id}`, response.status, {
+          hasData: !!data,
+          hasError: !!data.error,
+          worldId: data.id,
+          worldName: data.name
+        });
 
         if (data.error) {
+          logger.warn(`WorldClient: API returned error for ID ${id}`, data.error);
           setError(data.error)
           return
         }
 
         if (data.id) {
+          // 🚨 CRITICAL: Verify the returned world ID matches the requested ID
+          if (data.id !== id) {
+            logger.error(`WorldClient: ID MISMATCH! Requested: ${id}, Received: ${data.id}`, {
+              requestedId: id,
+              receivedId: data.id,
+              worldName: data.name,
+              url: `/api/world/${id}`
+            });
+          } else {
+            logger.info(`WorldClient: ID verification passed`, {
+              requestedId: id,
+              receivedId: data.id,
+              worldName: data.name
+            });
+          }
+          
+          logger.data(`WorldClient: Setting world data`, {
+            worldId: data.id,
+            worldName: data.name,
+            authorName: data.authorName
+          });
           setWorld(data)
         } else {
+          logger.warn(`WorldClient: No world ID in response for ${id}`, data);
           setError(t('noResults'))
         }
       } catch (err) {
-        console.error('Fetch world error:', err)
+        logger.error(`WorldClient: Fetch error for ID ${id}`, err);
+        logger.apiError('GET', `/api/world/${id}`, err);
         setError(t('error'))
       } finally {
         setLoading(false)
@@ -53,6 +87,18 @@ export default function WorldClient() {
 
     fetchWorld()
   }, [id, t])
+
+  // Log final state when world is set
+  useEffect(() => {
+    if (world) {
+      logger.info(`WorldClient: Final world state set`, {
+        requestedId: id,
+        worldId: world.id,
+        worldName: world.name,
+        authorName: world.authorName
+      });
+    }
+  }, [world, id])
 
   if (loading) {
     return (

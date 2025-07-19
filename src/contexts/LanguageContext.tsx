@@ -51,12 +51,19 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const detectedLang = detectLanguage()
     setLanguage(detectedLang)
     loadTranslations(detectedLang)
+    
+    // Set initial cookie for server-side access
+    if (typeof window !== 'undefined') {
+      document.cookie = `vrclookup-language=${detectedLang}; max-age=${60*60*24*365}; path=/; SameSite=lax`
+    }
   }, [])
 
   const handleSetLanguage = (lang: Language) => {
     setLanguage(lang)
     if (typeof window !== 'undefined') {
       localStorage.setItem('vrclookup-language', lang)
+      // Set cookie for server-side access
+      document.cookie = `vrclookup-language=${lang}; max-age=${60*60*24*365}; path=/; SameSite=lax`
     }
     
     const loadTranslations = async () => {

@@ -130,5 +130,5 @@ export interface ApiError {
   status?: number;
 }
 
-export type SearchType = "users" | "worlds" | "groups";
-export type SearchMethod = "name" | "id";
+export type SearchType = "users" | "worlds" | "groups" | "availability";
+export type SearchMethod = "name" | "id" | "username" | "email";

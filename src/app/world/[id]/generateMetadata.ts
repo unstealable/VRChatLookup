@@ -1,6 +1,9 @@
 import { Metadata } from "next";
-import { generateWorldMetadata } from "@/lib/metadata";
-import { headers } from "next/headers";
+import { generateWorldMetadata, detectServerLanguage } from "@/lib/metadata";
+import { headers, cookies } from "next/headers";
+import { logger } from "@/lib/logger";
+
+// Interface removed as we now use direct endpoint
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -10,16 +13,26 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const headersList = await headers();
+  const cookieStore = await cookies();
 
-  // Detect language from headers
+  logger.info(`Generating metadata for world ID: ${id}`);
+
+  // Enhanced language detection
   const acceptLanguage = headersList.get("accept-language");
-  const lang = acceptLanguage?.toLowerCase().startsWith("fr") ? "fr" : "en";
+  const cookieLang = cookieStore.get("vrclookup-language")?.value;
+  const lang = detectServerLanguage(acceptLanguage, cookieLang);
+  
+  logger.debug('Language detection', { acceptLanguage, cookieLang, detectedLang: lang });
 
   try {
     const baseUrl =
       process.env.VRCHAT_BRIDGE_API_URL ||
       "https://vrchat-bridge.unstealable.cloud";
-    const response = await fetch(`${baseUrl}/api/search/worlds/${id}?n=1`, {
+    
+    const worldUrl = `${baseUrl}/api/worlds/${id}`;  // Using NEW direct endpoint
+    logger.apiRequest('GET', worldUrl, { purpose: 'metadata generation', method: 'direct world lookup' });
+    
+    const response = await fetch(worldUrl, {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
@@ -40,10 +53,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       };
     }
 
-    const searchData = await response.json();
-    const world = Array.isArray(searchData) ? searchData[0] : searchData;
+    const worldData = await response.json();
+    logger.apiResponse('GET', worldUrl, response.status, {
+      worldId: worldData?.id,
+      worldName: worldData?.name,
+      hasData: !!worldData
+    });
+    
+    const world = worldData;
 
     if (!world) {
+      logger.warn(`No world data found for metadata generation, ID: ${id}`);
       return {
         title:
           lang === "fr"
@@ -56,9 +76,27 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       };
     }
 
+    // ✅ VERIFICATION: With direct endpoint, ID should always match
+    if (world.id && world.id !== id) {
+      logger.error(`UNEXPECTED METADATA ID MISMATCH with direct endpoint! Requested: ${id}, Got: ${world.id}`, {
+        requestedId: id,
+        returnedId: world.id,
+        worldName: world.name,
+        worldUrl
+      });
+    } else {
+      logger.info(`Direct metadata world lookup successful`, {
+        requestedId: id,
+        returnedId: world.id,
+        worldName: world.name
+      });
+    }
+    
+    logger.debug('Generating world metadata', { worldId: world.id, worldName: world.name, lang });
     return generateWorldMetadata(world, lang);
   } catch (error) {
-    console.error("Error generating world metadata:", error);
+    logger.error(`Error generating world metadata for ID: ${id}`, error);
+    logger.apiError('GET', 'world metadata', error)
     return {
       title: lang === "fr" ? "Monde | VRChat Lookup" : "World | VRChat Lookup",
       description:

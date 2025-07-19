@@ -13,7 +13,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { FaviconIcon } from "@/components/FaviconIcon";
+import { DomainLink } from "@/components/DomainLink";
 import { VRChatUser } from "@/types/vrchat";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -212,19 +212,10 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({ user }) => {
                   <h3 className="font-semibold mb-2">Links</h3>
                   <div className="space-y-2">
                     {user.bioLinks.map((link, index) => (
-                      <a
+                      <DomainLink
                         key={index}
-                        href={link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 p-2 rounded-md hover:bg-secondary/50 transition-colors group"
-                      >
-                        <FaviconIcon url={link} className="w-4 h-4" />
-                        <span className="text-sm text-muted-foreground group-hover:text-foreground truncate">
-                          {link}
-                        </span>
-                        <ExternalLink className="w-3 h-3 text-muted-foreground group-hover:text-primary transition-colors" />
-                      </a>
+                        url={link}
+                      />
                     ))}
                   </div>
                 </div>

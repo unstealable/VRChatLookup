@@ -7,6 +7,7 @@ import { ProfileCard } from "@/components/ProfileCard";
 import { WorldCard } from "@/components/WorldCard";
 import { GroupCard } from "@/components/GroupCard";
 import { ResultSelector } from "@/components/ResultSelector";
+import { ValidationResult } from "@/components/ValidationResult";
 import { Navigation } from "@/components/Navigation";
 import { StructuredData } from "@/components/StructuredData";
 import { VRChatUser, VRChatWorld, VRChatGroup, SearchResponse, SearchType, SearchMethod } from "@/types/vrchat";
@@ -21,6 +22,15 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [currentSearchType, setCurrentSearchType] = useState<SearchType>('users');
   const [showResultSelector, setShowResultSelector] = useState(false);
+  const [validationResult, setValidationResult] = useState<{
+    type: 'username' | 'email';
+    value: string;
+    exists: boolean | null;
+    available: boolean | null;
+    message: string;
+    error?: string | null;
+    isLoading: boolean;
+  } | null>(null);
   const { t } = useLanguage();
   const router = useRouter();
 
@@ -34,8 +44,76 @@ export default function Home() {
     setUsers([]);
     setWorlds([]);
     setGroups([]);
+    setValidationResult(null);
     setCurrentSearchType(type);
     setShowResultSelector(false);
+
+    // Handle availability requests
+    if (type === 'availability' && (method === 'username' || method === 'email')) {
+      setValidationResult({
+        type: method,
+        value: query,
+        exists: null,
+        available: null,
+        message: t("checking") || "Checking...",
+        isLoading: true
+      });
+
+      try {
+        const response = await fetch(
+          `/api/validate?type=${method}&value=${encodeURIComponent(query)}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data.error) {
+          setValidationResult({
+            type: method,
+            value: query,
+            exists: null,
+            available: null,
+            message: data.error,
+            error: data.error,
+            isLoading: false
+          });
+          return;
+        }
+
+        setValidationResult({
+          type: method,
+          value: query,
+          exists: data.exists,
+          available: data.available,
+          message: data.message,
+          isLoading: false
+        });
+
+      } catch (err) {
+        console.error("Validation error:", err);
+        setValidationResult({
+          type: method,
+          value: query,
+          exists: null,
+          available: null,
+          message: t("error") || "Error occurred",
+          error: t("error") || "Error occurred",
+          isLoading: false
+        });
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
 
     try {
       const response = await fetch(
@@ -124,6 +202,21 @@ export default function Home() {
   };
 
   const renderResults = () => {
+    // Show validation result if it exists
+    if (validationResult) {
+      return (
+        <ValidationResult
+          type={validationResult.type}
+          value={validationResult.value}
+          exists={validationResult.exists}
+          available={validationResult.available}
+          message={validationResult.message}
+          error={validationResult.error}
+          isLoading={validationResult.isLoading}
+        />
+      );
+    }
+
     if (showResultSelector) {
       let results: (VRChatUser | VRChatWorld | VRChatGroup)[] = [];
       

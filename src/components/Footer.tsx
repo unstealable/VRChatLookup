@@ -1,6 +1,7 @@
 'use client'
 
 import { useLanguage } from '@/contexts/LanguageContext'
+import { ApiStatusIndicator } from '@/components/ApiStatusIndicator'
 
 interface FooterProps {
   showDisclaimer: boolean
@@ -27,7 +28,8 @@ export default function Footer({ showDisclaimer }: FooterProps) {
               <span className="mx-2 text-border">•</span>
             )}
             {appUrl && (
-              <span className="font-medium text-foreground/80">
+              <span className="font-medium text-foreground/80 flex items-center gap-2">
+                <ApiStatusIndicator />
                 {appUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')}
               </span>
             )}

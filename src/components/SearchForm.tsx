@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Search, User, Globe, Users, Hash, Type } from "lucide-react";
+import { Search, User, Globe, Users, Hash, Type, CheckCircle, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Toggle } from "@/components/ui/toggle";
@@ -46,6 +46,14 @@ export const SearchForm: React.FC<SearchFormProps> = ({
   };
 
   const getPlaceholderText = () => {
+    if (searchType === "availability") {
+      if (searchMethod === "username") {
+        return t("usernamePlaceholder") || "Enter username to check availability...";
+      }
+      if (searchMethod === "email") {
+        return t("emailPlaceholder") || "Enter email to check availability...";
+      }
+    }
     if (searchMethod === "id") {
       if (searchType === "users")
         return "usr_xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx";
@@ -61,6 +69,9 @@ export const SearchForm: React.FC<SearchFormProps> = ({
     if (searchType === "groups" && searchMethod === "name") {
       return false; // Groups can only be searched by ID
     }
+    if (searchType === "availability" && !["username", "email"].includes(searchMethod)) {
+      return false; // Availability type only works with username/email methods
+    }
     return true;
   };
 
@@ -72,6 +83,10 @@ export const SearchForm: React.FC<SearchFormProps> = ({
         return <Globe className="w-4 h-4" />;
       case "groups":
         return <Users className="w-4 h-4" />;
+      case "availability":
+        return <CheckCircle className="w-4 h-4" />;
+      default:
+        return <Search className="w-4 h-4" />;
     }
   };
 
@@ -81,6 +96,12 @@ export const SearchForm: React.FC<SearchFormProps> = ({
         return <Type className="w-4 h-4" />;
       case "id":
         return <Hash className="w-4 h-4" />;
+      case "username":
+        return <User className="w-4 h-4" />;
+      case "email":
+        return <Mail className="w-4 h-4" />;
+      default:
+        return <Search className="w-4 h-4" />;
     }
   };
 
@@ -141,7 +162,7 @@ export const SearchForm: React.FC<SearchFormProps> = ({
               {t("searchType")}
             </span>
             <div className="flex bg-muted/50 rounded-lg p-1 backdrop-blur-sm">
-              {(["users", "worlds", "groups"] as SearchType[]).map((type) => (
+              {(["users", "worlds", "groups", "availability"] as SearchType[]).map((type) => (
                 <Toggle
                   key={type}
                   pressed={searchType === type}
@@ -149,6 +170,13 @@ export const SearchForm: React.FC<SearchFormProps> = ({
                     setSearchType(type);
                     if (type === "groups") {
                       setSearchMethod("id");
+                    } else if (type === "availability") {
+                      setSearchMethod("username");
+                    } else {
+                      // Pour users et worlds, remettre à "name" par défaut
+                      if (searchMethod === "username" || searchMethod === "email") {
+                        setSearchMethod("name");
+                      }
                     }
                   }}
                   className="h-10 px-4 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground transition-all duration-200"
@@ -157,9 +185,10 @@ export const SearchForm: React.FC<SearchFormProps> = ({
                   <div className="flex items-center gap-2">
                     {getSearchTypeIcon(type)}
                     <span className="font-medium">
-                      {t(
-                        `search${type.charAt(0).toUpperCase() + type.slice(1)}`
-                      )}
+                      {type === "users" ? t("searchUsers") :
+                       type === "worlds" ? t("searchWorlds") :
+                       type === "groups" ? t("searchGroups") :
+                       type === "availability" ? t("searchAvailability") : type}
                     </span>
                   </div>
                 </Toggle>
@@ -174,7 +203,10 @@ export const SearchForm: React.FC<SearchFormProps> = ({
                 {t("searchMethod")}
               </span>
               <div className="flex bg-muted/50 rounded-lg p-1 backdrop-blur-sm">
-                {(["name", "id"] as SearchMethod[]).map((method) => (
+                {(searchType === "availability" 
+                  ? ["username", "email"] as SearchMethod[]
+                  : ["name", "id"] as SearchMethod[]
+                ).map((method) => (
                   <Toggle
                     key={method}
                     pressed={searchMethod === method}
@@ -185,7 +217,10 @@ export const SearchForm: React.FC<SearchFormProps> = ({
                     <div className="flex items-center gap-2">
                       {getSearchMethodIcon(method)}
                       <span className="font-medium">
-                        {method === "name" ? t("searchByName") : "ID"}
+                        {method === "name" ? t("searchByName") : 
+                         method === "id" ? "ID" :
+                         method === "username" ? t("searchUsername") : 
+                         method === "email" ? t("searchEmail") : method}
                       </span>
                     </div>
                   </Toggle>

@@ -1,6 +1,6 @@
 import { Metadata } from "next";
-import { generateUserMetadata } from "@/lib/metadata";
-import { headers } from "next/headers";
+import { generateUserMetadata, detectServerLanguage } from "@/lib/metadata";
+import { headers, cookies } from "next/headers";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -10,10 +10,12 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const headersList = await headers();
+  const cookieStore = await cookies();
 
-  // Detect language from headers
+  // Enhanced language detection
   const acceptLanguage = headersList.get("accept-language");
-  const lang = acceptLanguage?.toLowerCase().startsWith("fr") ? "fr" : "en";
+  const cookieLang = cookieStore.get("vrclookup-language")?.value;
+  const lang = detectServerLanguage(acceptLanguage, cookieLang);
 
   try {
     const baseUrl =

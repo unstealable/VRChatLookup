@@ -105,6 +105,25 @@ function t(key: string, lang: Language): string {
   return seoTranslations[key]?.[lang] || seoTranslations[key]?.en || key
 }
 
+// Enhanced language detection for server-side rendering
+export function detectServerLanguage(acceptLanguageHeader?: string | null, cookieLang?: string): Language {
+  // First priority: explicit cookie/param language
+  if (cookieLang && (cookieLang === 'fr' || cookieLang === 'en')) {
+    return cookieLang as Language
+  }
+  
+  // Second priority: Accept-Language header
+  if (acceptLanguageHeader) {
+    const lang = acceptLanguageHeader.toLowerCase()
+    if (lang.includes('fr-') || lang.startsWith('fr')) {
+      return 'fr'
+    }
+  }
+  
+  // Default to English
+  return 'en'
+}
+
 export function getBaseMetadata(lang: Language = 'en'): Metadata {
   return {
     title: {
@@ -187,21 +206,31 @@ export function getBaseMetadata(lang: Language = 'en'): Metadata {
   },
   manifest: '/manifest.json',
   icons: {
-    icon: '/favicon.ico',
-    shortcut: '/favicon-16x16.png',
+    icon: [
+      {
+        url: '/favicon.ico',
+        sizes: 'any',
+      },
+      {
+        url: '/assets/favicon/web-app-manifest-192x192.png',
+        sizes: '192x192',
+        type: 'image/png',
+      },
+    ],
+    shortcut: '/favicon.ico',
     apple: '/apple-touch-icon.png',
     other: [
       {
         rel: 'icon',
         type: 'image/png',
-        sizes: '32x32',
-        url: '/favicon-32x32.png',
+        sizes: '192x192',
+        url: '/assets/favicon/web-app-manifest-192x192.png',
       },
       {
         rel: 'icon',
         type: 'image/png',
-        sizes: '16x16',
-        url: '/favicon-16x16.png',
+        sizes: '512x512',
+        url: '/assets/favicon/web-app-manifest-512x512.png',
       },
     ],
   },
@@ -213,7 +242,8 @@ export const baseMetadata = getBaseMetadata('en')
 export function generateUserMetadata(user: { displayName: string; bio?: string; profilePicOverrideThumbnail?: string; currentAvatarThumbnailImageUrl?: string; username?: string; status?: string }, lang: Language = 'en'): Metadata {
   const statusText = user.status ? ` (${user.status})` : ''
   const usernameText = user.username ? ` (@${user.username})` : ''
-  const bioText = user.bio ? ` - ${user.bio.slice(0, 120)}...` : ''
+  // Enhanced bio handling - use full bio if available, truncated if too long
+  const bioText = user.bio ? (user.bio.length > 120 ? ` - ${user.bio.slice(0, 120)}...` : ` - ${user.bio}`) : ''
   
   return {
     title: `${user.displayName}${usernameText}${statusText} - ${t('userProfile', lang)}`,
@@ -261,7 +291,8 @@ export function generateUserMetadata(user: { displayName: string; bio?: string; 
 
 export function generateWorldMetadata(world: { name: string; authorName?: string; description?: string; thumbnailImageUrl?: string; visitCount?: number; capacity?: number; tags?: string[] }, lang: Language = 'en'): Metadata {
   const authorText = world.authorName ? ` ${t('by', lang)} ${world.authorName}` : ''
-  const descText = world.description ? ` - ${world.description.slice(0, 120)}...` : ''
+  // Enhanced description handling - use full description if available, truncated if too long
+  const descText = world.description ? (world.description.length > 120 ? ` - ${world.description.slice(0, 120)}...` : ` - ${world.description}`) : ''
   const visitText = world.visitCount ? ` | ${world.visitCount.toLocaleString()} ${t('visits', lang)}` : ''
   const capacityText = world.capacity ? ` | ${world.capacity} ${t('capacity', lang)}` : ''
   
@@ -307,7 +338,8 @@ export function generateWorldMetadata(world: { name: string; authorName?: string
 }
 
 export function generateGroupMetadata(group: { name: string; description?: string; iconUrl?: string; memberCount?: number; ownerDisplayName?: string; shortCode?: string }, lang: Language = 'en'): Metadata {
-  const descText = group.description ? ` - ${group.description.slice(0, 120)}...` : ''
+  // Enhanced description handling - use full description if available, truncated if too long
+  const descText = group.description ? (group.description.length > 120 ? ` - ${group.description.slice(0, 120)}...` : ` - ${group.description}`) : ''
   const memberText = group.memberCount ? ` | ${group.memberCount.toLocaleString()} ${t('members', lang)}` : ''
   const ownerText = group.ownerDisplayName ? ` | ${t('createdBy', lang)} ${group.ownerDisplayName}` : ''
   const shortCodeText = group.shortCode ? ` (${group.shortCode})` : ''

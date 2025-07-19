@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { VRChatGroup } from "@/types/vrchat";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { DomainLink } from "@/components/DomainLink";
 
 interface GroupCardProps {
   group: VRChatGroup;
@@ -155,17 +156,13 @@ export const GroupCard: React.FC<GroupCardProps> = ({ group }) => {
             {group.links && group.links.length > 0 && (
               <div>
                 <h3 className="font-semibold mb-2">{t("links")}</h3>
-                <div className="space-y-2">
+                <div className="space-y-1">
                   {group.links.map((link, index) => (
-                    <a
+                    <DomainLink
                       key={index}
-                      href={link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block p-2 bg-secondary/30 rounded text-sm hover:bg-secondary/50 transition-colors break-all"
-                    >
-                      {link}
-                    </a>
+                      url={link}
+                      className="bg-secondary/30 hover:bg-secondary/50"
+                    />
                   ))}
                 </div>
               </div>
