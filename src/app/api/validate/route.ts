@@ -56,8 +56,8 @@ export async function GET(request: NextRequest) {
     const data = await response.json()
     logger.apiResponse('GET', validateUrl, response.status, { exists: !!data })
     
-    // If we get data back, it means the username/email exists
-    const exists = !!data && typeof data === 'object'
+    // Use data.userExists to determine if username/email exists
+    const exists = data && data.userExists === true
     
     logger.info(`${type} validation result`, { 
       type, 
