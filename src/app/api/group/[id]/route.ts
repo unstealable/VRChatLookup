@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { globalCache } from '@/lib/cache'
 
 export async function GET(
   request: NextRequest,
@@ -7,6 +8,23 @@ export async function GET(
   try {
     const baseUrl = process.env.VRCHAT_BRIDGE_API_URL || 'https://vrchat-bridge.unstealable.cloud'
     const { id: groupId } = await params
+
+    // Check cache first
+    const cacheKey = globalCache.generateKey('group', groupId)
+    const cachedData = globalCache.get(cacheKey)
+    
+    if (cachedData) {
+      console.log(`Cache hit for group: ${groupId}`)
+      return NextResponse.json(cachedData, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'public, max-age=3600, stale-while-revalidate=300',
+          'X-Cache': 'HIT',
+        },
+      })
+    }
+
+    console.log(`Cache miss for group: ${groupId}, fetching from API`)
 
     // Récupérer le groupe par ID
     const groupResponse = await fetch(`${baseUrl}/api/groups/${groupId}`, {
@@ -69,10 +87,14 @@ export async function GET(
       roles: Array.isArray(groupRoles) ? groupRoles : [],
     }
 
+    // Store in cache
+    globalCache.set(cacheKey, enrichedGroupData)
+
     return NextResponse.json(enrichedGroupData, {
       headers: {
         'Content-Type': 'application/json',
-        'Cache-Control': 'public, max-age=60, stale-while-revalidate=300',
+        'Cache-Control': 'public, max-age=3600, stale-while-revalidate=300',
+        'X-Cache': 'MISS',
       },
     })
 

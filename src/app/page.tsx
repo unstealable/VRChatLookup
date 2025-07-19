@@ -181,7 +181,7 @@ export default function Home() {
   const websiteStructuredData = generateWebsiteStructuredData()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-background/50 relative">
+    <div className="bg-gradient-to-br from-background to-background/50 relative">
       <StructuredData data={websiteStructuredData} />
       <Navigation />
       <div className="container mx-auto px-4 py-8 lg:py-16">

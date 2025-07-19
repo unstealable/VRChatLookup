@@ -76,5 +76,10 @@
   "version": "Version",
   "author": "Auteur",
   "publishedOn": "Publié le",
-  "lastUpdated": "Dernière mise à jour"
+  "lastUpdated": "Dernière mise à jour",
+  "disclaimerTitle": "Avis Important",
+  "disclaimerContent": "VRChat Lookup est un outil tiers indépendant et n'est pas affilié, approuvé ou connecté à VRChat Inc. ou son équipe de quelque manière que ce soit. Cette application est développée et maintenue de manière indépendante.",
+  "disclaimerButton": "J'ai compris",
+  "copyrightText": "Copyright",
+  "disclaimerFooter": "Non affilié à VRChat Inc."
 }

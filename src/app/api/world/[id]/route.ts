@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { globalCache } from '@/lib/cache'
 
 export async function GET(
   request: NextRequest,
@@ -7,6 +8,23 @@ export async function GET(
   try {
     const baseUrl = process.env.VRCHAT_BRIDGE_API_URL || 'https://vrchat-bridge.unstealable.cloud'
     const { id: worldId } = await params
+
+    // Check cache first
+    const cacheKey = globalCache.generateKey('world', worldId)
+    const cachedData = globalCache.get(cacheKey)
+    
+    if (cachedData) {
+      console.log(`Cache hit for world: ${worldId}`)
+      return NextResponse.json(cachedData, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'public, max-age=3600, stale-while-revalidate=300',
+          'X-Cache': 'HIT',
+        },
+      })
+    }
+
+    console.log(`Cache miss for world: ${worldId}, fetching from API`)
 
     // Rechercher le monde par ID en utilisant l'endpoint de recherche
     const searchResponse = await fetch(`${baseUrl}/api/search/worlds/${worldId}?n=1`, {
@@ -34,10 +52,14 @@ export async function GET(
     // Retourner le premier résultat (ou l'objet direct si ce n'est pas un array)
     const worldData = Array.isArray(searchData) ? searchData[0] : searchData
 
+    // Store in cache
+    globalCache.set(cacheKey, worldData)
+
     return NextResponse.json(worldData, {
       headers: {
         'Content-Type': 'application/json',
-        'Cache-Control': 'public, max-age=60, stale-while-revalidate=300',
+        'Cache-Control': 'public, max-age=3600, stale-while-revalidate=300',
+        'X-Cache': 'MISS',
       },
     })
 

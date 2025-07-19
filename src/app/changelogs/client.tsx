@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useLanguage } from '@/contexts/LanguageContext'
-import { ArrowLeft, ChevronRight, Calendar, User, FileText } from 'lucide-react'
+import { ArrowLeft, ChevronRight, Calendar, User, FileText, Filter, ArrowUpDown } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import Link from 'next/link'
 
 interface ChangelogEntry {
@@ -12,6 +13,7 @@ interface ChangelogEntry {
   version?: string
   author: string
   content: string
+  category: string
   changes: {
     type: 'added' | 'changed' | 'fixed' | 'removed'
     description: string
@@ -22,11 +24,30 @@ export default function ChangelogsClient() {
   const { t, language } = useLanguage()
   const [changelogs, setChangelogs] = useState<ChangelogEntry[]>([])
   const [loading, setLoading] = useState(true)
+  const [selectedCategory, setSelectedCategory] = useState<string>('all')
+  const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest')
+
+  const categories = [
+    { value: 'all', label: language === 'fr' ? 'Toutes catégories' : 'All Categories' },
+    { value: 'feature', label: language === 'fr' ? 'Nouvelles fonctionnalités' : 'New Features' },
+    { value: 'improvement', label: language === 'fr' ? 'Améliorations' : 'Improvements' },
+    { value: 'bugfix', label: language === 'fr' ? 'Corrections de bugs' : 'Bug Fixes' },
+    { value: 'technical', label: language === 'fr' ? 'Technique' : 'Technical' },
+    { value: 'ui', label: language === 'fr' ? 'Interface utilisateur' : 'User Interface' },
+    { value: 'seo', label: 'SEO' },
+    { value: 'general', label: language === 'fr' ? 'Général' : 'General' }
+  ]
 
   useEffect(() => {
     const fetchChangelogs = async () => {
       try {
-        const response = await fetch('/api/changelogs')
+        const params = new URLSearchParams()
+        if (selectedCategory !== 'all') {
+          params.append('category', selectedCategory)
+        }
+        params.append('sort', sortOrder)
+        
+        const response = await fetch(`/api/changelogs?${params}`)
         const data = await response.json()
         setChangelogs(data)
       } catch (error) {
@@ -37,7 +58,7 @@ export default function ChangelogsClient() {
     }
 
     fetchChangelogs()
-  }, [])
+  }, [selectedCategory, sortOrder])
 
   if (loading) {
     return (
@@ -67,9 +88,55 @@ export default function ChangelogsClient() {
           <h1 className="text-4xl font-bold text-foreground mb-2">
             {language === 'fr' ? 'Journal des modifications' : 'Changelogs'}
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground mb-6">
             {t('trackLatestUpdates')}
           </p>
+          
+          {/* Filtering and Sorting Controls */}
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-2">
+                <Filter className="w-4 h-4" />
+                <span className="text-sm font-medium">
+                  {language === 'fr' ? 'Catégorie' : 'Category'}
+                </span>
+              </div>
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((category) => (
+                    <SelectItem key={category.value} value={category.value}>
+                      {category.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-2">
+                <ArrowUpDown className="w-4 h-4" />
+                <span className="text-sm font-medium">
+                  {language === 'fr' ? 'Tri' : 'Sort'}
+                </span>
+              </div>
+              <Select value={sortOrder} onValueChange={(value: 'newest' | 'oldest') => setSortOrder(value)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="newest">
+                    {language === 'fr' ? 'Plus récents d\'abord' : 'Newest First'}
+                  </SelectItem>
+                  <SelectItem value="oldest">
+                    {language === 'fr' ? 'Plus anciens d\'abord' : 'Oldest First'}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </div>
 
         {changelogs.length === 0 ? (
@@ -107,6 +174,11 @@ export default function ChangelogsClient() {
                       {entry.version && (
                         <span className="bg-primary/10 text-primary px-2 py-1 rounded text-xs font-medium">
                           v{entry.version}
+                        </span>
+                      )}
+                      {entry.category && entry.category !== 'general' && (
+                        <span className="bg-muted/50 text-foreground px-2 py-1 rounded text-xs font-medium">
+                          {categories.find(c => c.value === entry.category)?.label || entry.category}
                         </span>
                       )}
                     </div>

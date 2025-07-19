@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { globalCache } from '@/lib/cache'
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,6 +15,23 @@ export async function GET(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    // Check cache first for search results
+    const cacheKey = globalCache.generateSearchKey(type, query, method)
+    const cachedData = globalCache.get(cacheKey)
+    
+    if (cachedData) {
+      console.log(`Cache hit for search: ${type}/${method}/${query}`)
+      return NextResponse.json(cachedData, {
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "public, max-age=3600, stale-while-revalidate=300",
+          "X-Cache": "HIT",
+        },
+      })
+    }
+
+    console.log(`Cache miss for search: ${type}/${method}/${query}, fetching from API`)
 
     // Base URL pour l'API VRChat Bridge
     const baseUrl = process.env.VRCHAT_BRIDGE_API_URL || "https://vrchat-bridge.unstealable.cloud";
@@ -104,10 +122,14 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Store search results in cache
+    globalCache.set(cacheKey, normalizedData)
+
     return NextResponse.json(normalizedData, {
       headers: {
         "Content-Type": "application/json",
-        "Cache-Control": "public, max-age=60, stale-while-revalidate=300",
+        "Cache-Control": "public, max-age=3600, stale-while-revalidate=300",
+        "X-Cache": "MISS",
       },
     });
   } catch (error) {
