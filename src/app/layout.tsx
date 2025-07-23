@@ -13,7 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const headersList = await headers();
   
   const acceptLanguage = headersList.get("accept-language");
-  const cookieLang = cookieStore.get("vrclookup-language")?.value;
+  const cookieLang = cookieStore.get("vrchatlookup-language")?.value;
   const lang = detectServerLanguage(acceptLanguage, cookieLang);
   
   return getBaseMetadata(lang);
@@ -38,6 +38,12 @@ export default function RootLayout({
 }>) {
   return (
     <html suppressHydrationWarning>
+      <head>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/favicon/desktop/favicon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/favicon/mobile/apple-touch-icon.png" />
+        <link rel="manifest" href="/site.webmanifest" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

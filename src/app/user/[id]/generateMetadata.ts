@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   // Enhanced language detection
   const acceptLanguage = headersList.get("accept-language");
-  const cookieLang = cookieStore.get("vrclookup-language")?.value;
+  const cookieLang = cookieStore.get("vrchatlookup-language")?.value;
   const lang = detectServerLanguage(acceptLanguage, cookieLang);
 
   try {
@@ -49,8 +49,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return {
       title:
         lang === "fr"
-          ? "Profil Utilisateur | VRChat Lookup"
-          : "User Profile | VRChat Lookup",
+          ? "Utilisateur • VRChat Lookup"
+          : "User • VRChat Lookup",
       description:
         lang === "fr"
           ? "Consultez les profils d'utilisateurs VRChat, mondes et groupes sur VRChat Lookup - Le moteur de recherche VRChat ultime."

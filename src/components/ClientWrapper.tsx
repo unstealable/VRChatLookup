@@ -13,7 +13,7 @@ export default function ClientWrapper({ children }: ClientWrapperProps) {
   const [disclaimerAccepted, setDisclaimerAccepted] = useState(false)
 
   useEffect(() => {
-    const accepted = localStorage.getItem('vrclookup-disclaimer-accepted')
+    const accepted = localStorage.getItem('vrchatlookup-disclaimer-accepted')
     if (accepted === 'true') {
       setDisclaimerAccepted(true)
     } else {
@@ -24,7 +24,7 @@ export default function ClientWrapper({ children }: ClientWrapperProps) {
   const handleDisclaimerClose = () => {
     setShowPopup(false)
     setDisclaimerAccepted(true)
-    localStorage.setItem('vrclookup-disclaimer-accepted', 'true')
+    localStorage.setItem('vrchatlookup-disclaimer-accepted', 'true')
   }
 
   return (

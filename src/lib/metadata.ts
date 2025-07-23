@@ -19,28 +19,28 @@ const seoTranslations: SEOTranslations = {
     en: 'Discover and explore the VRChat universe - Search users, worlds, and groups effortlessly'
   },
   userProfile: {
-    fr: 'Profil Utilisateur VRChat',
-    en: 'VRChat User Profile'
+    fr: 'Utilisateur',
+    en: 'User'
   },
   worldProfile: {
-    fr: 'Monde VRChat',
-    en: 'VRChat World'
+    fr: 'Monde',
+    en: 'World'
   },
   groupProfile: {
-    fr: 'Groupe VRChat',
-    en: 'VRChat Group'
+    fr: 'Groupe',
+    en: 'Group'
   },
   userNotFound: {
-    fr: 'Utilisateur Introuvable | VRChat Lookup',
-    en: 'User Not Found | VRChat Lookup'
+    fr: 'Utilisateur Introuvable • VRChat Lookup',
+    en: 'User Not Found • VRChat Lookup'
   },
   worldNotFound: {
-    fr: 'Monde Introuvable | VRChat Lookup',
-    en: 'World Not Found | VRChat Lookup'
+    fr: 'Monde Introuvable • VRChat Lookup',
+    en: 'World Not Found • VRChat Lookup'
   },
   groupNotFound: {
-    fr: 'Groupe Introuvable | VRChat Lookup',
-    en: 'Group Not Found | VRChat Lookup'
+    fr: 'Groupe Introuvable • VRChat Lookup',
+    en: 'Group Not Found • VRChat Lookup'
   },
   userNotFoundDesc: {
     fr: 'L\'utilisateur VRChat demandé n\'a pas pu être trouvé. Recherchez des utilisateurs, mondes et groupes VRChat sur VRChat Lookup.',
@@ -128,7 +128,7 @@ export function getBaseMetadata(lang: Language = 'en'): Metadata {
   return {
     title: {
       default: t('siteTitle', lang),
-      template: '%s | VRChat Lookup',
+      template: '%s • VRChat Lookup',
     },
     description: t('siteDescription', lang),
   keywords: process.env.NEXT_PUBLIC_APP_KEYWORDS?.split(',') || [
@@ -246,7 +246,7 @@ export function generateUserMetadata(user: { displayName: string; bio?: string; 
   const bioText = user.bio ? (user.bio.length > 120 ? ` - ${user.bio.slice(0, 120)}...` : ` - ${user.bio}`) : ''
   
   return {
-    title: `${user.displayName}${usernameText}${statusText} - ${t('userProfile', lang)}`,
+    title: `${user.displayName}${usernameText}${statusText} • ${t('userProfile', lang)} • VRChat Lookup`,
     description: `${t('exploreProfile', lang)} ${user.displayName}${bioText} | ${t('findUsers', lang)}`,
     keywords: [
       'VRChat user', 
@@ -261,7 +261,7 @@ export function generateUserMetadata(user: { displayName: string; bio?: string; 
       'VR social'
     ].filter(Boolean),
     openGraph: {
-      title: `${user.displayName} - ${t('userProfile', lang)}`,
+      title: `${user.displayName} • ${t('userProfile', lang)} • VRChat Lookup`,
       description: `${t('exploreProfile', lang)} ${user.displayName}${user.bio ? `: ${user.bio.slice(0, 100)}...` : ''}`,
       type: 'profile',
       images: user.profilePicOverrideThumbnail || user.currentAvatarThumbnailImageUrl 
@@ -275,7 +275,7 @@ export function generateUserMetadata(user: { displayName: string; bio?: string; 
     },
     twitter: {
       card: 'summary',
-      title: `${user.displayName} - ${t('userProfile', lang)}`,
+      title: `${user.displayName} • ${t('userProfile', lang)} • VRChat Lookup`,
       description: `${t('exploreProfile', lang)} ${user.displayName}${user.bio ? `: ${user.bio.slice(0, 100)}...` : ''}`,
       images: user.profilePicOverrideThumbnail || user.currentAvatarThumbnailImageUrl 
         ? [{
@@ -297,7 +297,7 @@ export function generateWorldMetadata(world: { name: string; authorName?: string
   const capacityText = world.capacity ? ` | ${world.capacity} ${t('capacity', lang)}` : ''
   
   return {
-    title: `${world.name}${authorText} - ${t('worldProfile', lang)}`,
+    title: `${world.name}${authorText} • ${t('worldProfile', lang)} • VRChat Lookup`,
     description: `${t('discoverWorld', lang)} ${world.name}${authorText}${descText}${visitText}${capacityText} | ${t('exploreWorlds', lang)}`,
     keywords: [
       'VRChat world', 
@@ -313,7 +313,7 @@ export function generateWorldMetadata(world: { name: string; authorName?: string
       ...(world.tags || [])
     ].filter(Boolean),
     openGraph: {
-      title: `${world.name} - ${t('worldProfile', lang)}`,
+      title: `${world.name} • ${t('worldProfile', lang)} • VRChat Lookup`,
       description: `${t('discoverWorld', lang)} ${world.name}${world.authorName ? ` ${t('by', lang)} ${world.authorName}` : ''}${world.description ? `: ${world.description.slice(0, 100)}...` : ''}`,
       type: 'article',
       images: world.thumbnailImageUrl ? [{
@@ -325,7 +325,7 @@ export function generateWorldMetadata(world: { name: string; authorName?: string
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${world.name} - ${t('worldProfile', lang)}`,
+      title: `${world.name} • ${t('worldProfile', lang)} • VRChat Lookup`,
       description: `${t('discoverWorld', lang)} ${world.name}${world.authorName ? ` ${t('by', lang)} ${world.authorName}` : ''}${world.description ? `: ${world.description.slice(0, 100)}...` : ''}`,
       images: world.thumbnailImageUrl ? [{
         url: world.thumbnailImageUrl!,
@@ -345,7 +345,7 @@ export function generateGroupMetadata(group: { name: string; description?: strin
   const shortCodeText = group.shortCode ? ` (${group.shortCode})` : ''
   
   return {
-    title: `${group.name}${shortCodeText} - ${t('groupProfile', lang)}`,
+    title: `${group.name}${shortCodeText} • ${t('groupProfile', lang)} • VRChat Lookup`,
     description: `${t('joinGroup', lang)} ${group.name}${descText}${memberText}${ownerText} | ${t('findGroups', lang)}`,
     keywords: [
       'VRChat group', 
@@ -361,7 +361,7 @@ export function generateGroupMetadata(group: { name: string; description?: strin
       'VR community'
     ].filter(Boolean),
     openGraph: {
-      title: `${group.name} - ${t('groupProfile', lang)}`,
+      title: `${group.name} • ${t('groupProfile', lang)} • VRChat Lookup`,
       description: `${t('joinGroup', lang)} ${group.name}${group.description ? `: ${group.description.slice(0, 100)}...` : ''}`,
       type: 'article',
       images: group.iconUrl ? [{
@@ -373,7 +373,7 @@ export function generateGroupMetadata(group: { name: string; description?: strin
     },
     twitter: {
       card: 'summary',
-      title: `${group.name} - ${t('groupProfile', lang)}`,
+      title: `${group.name} • ${t('groupProfile', lang)} • VRChat Lookup`,
       description: `${t('joinGroup', lang)} ${group.name}${group.description ? `: ${group.description.slice(0, 100)}...` : ''}`,
       images: group.iconUrl ? [{
         url: group.iconUrl!,

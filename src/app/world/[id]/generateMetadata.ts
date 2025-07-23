@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   // Enhanced language detection
   const acceptLanguage = headersList.get("accept-language");
-  const cookieLang = cookieStore.get("vrclookup-language")?.value;
+  const cookieLang = cookieStore.get("vrchatlookup-language")?.value;
   const lang = detectServerLanguage(acceptLanguage, cookieLang);
   
   logger.debug('Language detection', { acceptLanguage, cookieLang, detectedLang: lang });
@@ -98,7 +98,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     logger.error(`Error generating world metadata for ID: ${id}`, error);
     logger.apiError('GET', 'world metadata', error)
     return {
-      title: lang === "fr" ? "Monde | VRChat Lookup" : "World | VRChat Lookup",
+      title: lang === "fr" ? "Monde • VRChat Lookup" : "World • VRChat Lookup",
       description:
         lang === "fr"
           ? "Explorez les mondes VRChat, expériences virtuelles et environnements sur VRChat Lookup - Le moteur de recherche VRChat ultime."

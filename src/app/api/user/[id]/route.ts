@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { globalCache } from '@/lib/cache'
+import { logger } from '@/lib/logger'
 
 export async function GET(
   request: NextRequest,
@@ -14,7 +15,7 @@ export async function GET(
     const cachedData = globalCache.get(cacheKey)
     
     if (cachedData) {
-      console.log(`Cache hit for user: ${userId}`)
+      logger.info(`Cache hit for user: ${userId}`)
       return NextResponse.json(cachedData, {
         headers: {
           'Content-Type': 'application/json',
@@ -24,7 +25,10 @@ export async function GET(
       })
     }
 
-    console.log(`Cache miss for user: ${userId}, fetching from API`)
+    logger.info(`Cache miss for user: ${userId}, fetching from API`)
+    
+    const userUrl = `${baseUrl}/api/users/${userId}`
+    logger.apiRequest('GET', userUrl, { purpose: 'user lookup' })
 
     // Récupérer le profil utilisateur principal
     const userResponse = await fetch(`${baseUrl}/api/users/${userId}`, {
@@ -43,6 +47,12 @@ export async function GET(
     }
 
     const userData = await userResponse.json()
+    
+    logger.apiResponse('GET', userUrl, userResponse.status, {
+      userId: userData?.id,
+      userName: userData?.displayName,
+      hasData: !!userData
+    })
 
     // Récupérer les groupes de l'utilisateur
     let userGroups = []
@@ -59,7 +69,7 @@ export async function GET(
         userGroups = await groupsResponse.json()
       }
     } catch (error) {
-      console.warn('Failed to fetch user groups:', error)
+      logger.warn('Failed to fetch user groups:', error)
     }
 
     // Récupérer les mondes de l'utilisateur
@@ -77,7 +87,7 @@ export async function GET(
         userWorlds = await worldsResponse.json()
       }
     } catch (error) {
-      console.warn('Failed to fetch user worlds:', error)
+      logger.warn('Failed to fetch user worlds:', error)
     }
 
     // Enrichir les données utilisateur
@@ -99,7 +109,8 @@ export async function GET(
     })
 
   } catch (error) {
-    console.error('API Error:', error)
+    logger.error('User API Error:', error)
+    logger.apiError('GET', 'user', error)
     
     if (error instanceof Error) {
       if (error.name === 'AbortError') {

@@ -17,6 +17,19 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [
+      // Rewrite localized routes to the base app structure
+      {
+        source: '/fr/:path*',
+        destination: '/:path*',
+      },
+      {
+        source: '/en/:path*', 
+        destination: '/:path*',
+      },
+    ];
+  },
 };
 
 export default nextConfig;

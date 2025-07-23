@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { globalCache } from '@/lib/cache'
+import { logger } from '@/lib/logger'
 
 export async function GET(
   request: NextRequest,
@@ -14,7 +15,7 @@ export async function GET(
     const cachedData = globalCache.get(cacheKey)
     
     if (cachedData) {
-      console.log(`Cache hit for group: ${groupId}`)
+      logger.info(`Cache hit for group: ${groupId}`)
       return NextResponse.json(cachedData, {
         headers: {
           'Content-Type': 'application/json',
@@ -24,7 +25,10 @@ export async function GET(
       })
     }
 
-    console.log(`Cache miss for group: ${groupId}, fetching from API`)
+    logger.info(`Cache miss for group: ${groupId}, fetching from API`)
+    
+    const groupUrl = `${baseUrl}/api/groups/${groupId}`
+    logger.apiRequest('GET', groupUrl, { purpose: 'group lookup' })
 
     // Récupérer le groupe par ID
     const groupResponse = await fetch(`${baseUrl}/api/groups/${groupId}`, {
@@ -43,6 +47,12 @@ export async function GET(
     }
 
     const groupData = await groupResponse.json()
+    
+    logger.apiResponse('GET', groupUrl, groupResponse.status, {
+      groupId: groupData?.id,
+      groupName: groupData?.name,
+      hasData: !!groupData
+    })
 
     // Essayer de récupérer les membres du groupe
     let groupMembers = []
@@ -59,7 +69,7 @@ export async function GET(
         groupMembers = await membersResponse.json()
       }
     } catch (error) {
-      console.warn('Failed to fetch group members:', error)
+      logger.warn('Failed to fetch group members:', error)
     }
 
     // Essayer de récupérer les rôles du groupe
@@ -77,7 +87,7 @@ export async function GET(
         groupRoles = await rolesResponse.json()
       }
     } catch (error) {
-      console.warn('Failed to fetch group roles:', error)
+      logger.warn('Failed to fetch group roles:', error)
     }
 
     // Enrichir les données du groupe
@@ -99,7 +109,8 @@ export async function GET(
     })
 
   } catch (error) {
-    console.error('API Error:', error)
+    logger.error('Group API Error:', error)
+    logger.apiError('GET', 'group', error)
     
     if (error instanceof Error) {
       if (error.name === 'AbortError') {

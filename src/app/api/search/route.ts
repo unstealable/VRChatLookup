@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { globalCache } from '@/lib/cache'
+import { logger } from '@/lib/logger'
 
 export async function GET(request: NextRequest) {
   try {
@@ -21,7 +22,7 @@ export async function GET(request: NextRequest) {
     const cachedData = globalCache.get(cacheKey)
     
     if (cachedData) {
-      console.log(`Cache hit for search: ${type}/${method}/${query}`)
+      logger.info(`Cache hit for search: ${type}/${method}/${query}`)
       return NextResponse.json(cachedData, {
         headers: {
           "Content-Type": "application/json",
@@ -31,7 +32,7 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    console.log(`Cache miss for search: ${type}/${method}/${query}, fetching from API`)
+    logger.info(`Cache miss for search: ${type}/${method}/${query}, fetching from API`)
 
     // Base URL pour l'API VRChat Bridge
     const baseUrl = process.env.VRCHAT_BRIDGE_API_URL || "https://vrchat-bridge.unstealable.cloud";
@@ -74,6 +75,13 @@ export async function GET(request: NextRequest) {
     const url = `${baseUrl}${endpoint}${
       method === "name" ? `?n=${limit}` : ""
     }`;
+    
+    logger.apiRequest('GET', url, { 
+      purpose: 'search',
+      type,
+      method,
+      query: query.substring(0, 50) // Limit query logging
+    });
 
     const response = await fetch(url, {
       method: "GET",
@@ -93,6 +101,11 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await response.json();
+    
+    logger.apiResponse('GET', url, response.status, {
+      resultCount: Array.isArray(data) ? data.length : (data?.users?.length || data?.worlds?.length || data?.groups?.length || 0),
+      hasData: !!data
+    });
 
     // Validation basique du JSON reçu
     if (!data) {
@@ -133,7 +146,8 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("API Error:", error);
+    logger.error('Search API Error:', error);
+    logger.apiError('GET', 'search', error);
 
     // Gestion des différents types d'erreurs
     if (error instanceof Error) {

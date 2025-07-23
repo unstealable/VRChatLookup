@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   // Enhanced language detection
   const acceptLanguage = headersList.get("accept-language");
-  const cookieLang = cookieStore.get("vrclookup-language")?.value;
+  const cookieLang = cookieStore.get("vrchatlookup-language")?.value;
   const lang = detectServerLanguage(acceptLanguage, cookieLang);
 
   try {
@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   } catch (error) {
     console.error("Error generating group metadata:", error);
     return {
-      title: lang === "fr" ? "Groupe | VRChat Lookup" : "Group | VRChat Lookup",
+      title: lang === "fr" ? "Groupe • VRChat Lookup" : "Group • VRChat Lookup",
       description:
         lang === "fr"
           ? "Rejoignez les groupes VRChat, communautés et cercles sociaux sur VRChat Lookup - Le moteur de recherche VRChat ultime."

@@ -25,7 +25,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [effectiveTheme, setEffectiveTheme] = useState<'dark' | 'light'>('dark')
 
   useEffect(() => {
-    const stored = localStorage.getItem('vrclookup-theme') as Theme
+    const stored = localStorage.getItem('vrchatlookup-theme') as Theme
     if (stored && (stored === 'dark' || stored === 'light' || stored === 'system')) {
       setTheme(stored)
     } else {
@@ -73,7 +73,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const handleSetTheme = (newTheme: Theme) => {
     setTheme(newTheme)
-    localStorage.setItem('vrclookup-theme', newTheme)
+    localStorage.setItem('vrchatlookup-theme', newTheme)
   }
 
   return (
